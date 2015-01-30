@@ -3,34 +3,36 @@
 
 // but you don't so you're going to write it from scratch:
 var stringifyJSON = function(obj) {
-	//handling all cases except object
-	switch(typeof obj){
-		case "number":
-		case "boolean": return obj.toString();
-		case "function":
-		case "undefined": return undefined;
-		case "string": obj = "\"" + obj + "\"";
-						return obj.toString();
-		default: break;
-	}
-	if(obj === null)
-		return "null";
-	var resultArray = [];
-	if(Array.isArray(obj)){
-		for(var i = 0; i < obj.length; i++){
-			if(!(typeof obj[i] === "function" || typeof obj[i] === "undefined"))
-				resultArray.push(stringifyJSON(obj[i]));
-			else
-				//JSON.stringify returns null for a function and undefined within an array
-				resultArray.push("null");	
-		}	
-		return '[' + resultArray + ']';
-	}
-	else{
-		for(var key in obj){
-			if(!(typeof obj[key] === "function" || typeof obj[key] === "undefined"))
-			resultArray.push(stringifyJSON(key) + ":" + stringifyJSON(obj[key]));
-		}
-		return '{' + resultArray + '}';
-	}
+  //Wrap strings in quotes as per JSON specs
+  if(typeof obj === 'string'){
+    return '"'+obj+'"';
+  }
+  //temp array used to hold Array and Object results.
+  var result =[];
+
+  //Check if obj is an array
+  if(Array.isArray(obj)){
+    //Iterate over each element of the array
+    for(var i = 0; i < obj.length; i++ ){
+      //Stringify element and add to result array.
+      result.push(stringifyJSON(obj[i]));
+    }
+    //wrap the array with the square brackets and convert it into a string
+    return '[' + result + ']';
+  }
+  //check if obj is an object and not null
+  if(typeof obj === 'object' && obj !== null){
+    //iterate through each key value pair
+    for(var key in obj){
+      //if the value is not a function or undefined
+      if(!(typeof obj[key] === 'function' || obj[key] === undefined)){
+        //stringify the key and value and add it to result array
+        result.push(stringifyJSON(key) + ':' + stringifyJSON(obj[key]));
+      }
+    }
+    //wrap the array with curly brackets and convert it into a string
+    return '{' + result + '}';
+  }
+  //return obj coerced into a string
+  return ''+obj;
 };

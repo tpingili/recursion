@@ -5,29 +5,28 @@
 
 // But instead we're going to implement it from scratch:
 var getElementsByClassName = function(className){
-//if multiple classes are given as arguments, store them in an array
-  var classNames = String.prototype.split.call(className, " ");
-  //array to store the selected elements
-  var resultElement =[];
+  // get the starting node
+  var node = arguments[1] || document.body;
+  // declare an empty array to hold the results
+  var result =[];
+  //split class strings into an array
+  var classes = node.className.split(' ');
 
-  var checkForClass = function(element){
-  	//if element has classes
-  	if(element.classList){
-  		//check whether the element's classes match the class names in the classNames array
-  		var result = true;
-  		for(var i = 0; i < classNames.length; i++)
-			result = result && element.classList.contains(classNames[i])
-		//result returns true only if the element's classes contains all the classes asked for, then push it into the array returned
-		if(result)
-			resultElement.push(element);
-  	}
-  	//if element has children, run the recursive function on each of the child nodes
-  	if(element.childNodes){
-  		var children = element.childNodes;
-  		for(var i = 0; i < children.length;i++)
-  			checkForClass(children[i]);
-  	}
-  	return resultElement;
-  };
-  return checkForClass(document.body);
-};
+  // check if the current node has className
+  if(classes.indexOf(className) >= 0){
+    // push the node into result array
+    result.push(node);
+  }
+
+  // check if the current node has children
+  if(node.children){
+    //iterate through each child
+    for(var i = 0;i< node.children.length;i++){
+      var child = node.children[i];
+      //concat the result of getElementsByClassName function on each child
+      result = result.concat(getElementsByClassName(className, child))
+    }
+  }
+  //return result array
+  return result;
+}
